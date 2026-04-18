@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NH농협은행 AI 전략적 포트폴리오 관리 시스템</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --bg:      #F8FAFC;
+  --white:   #FFFFFF;
+  --sub:     #F1F5F9;
+  --border:  #E2E8F0;
+  --border2: #CBD5E1;
+  --t1:      #0F172A;
+  --t2:      #475569;
+  --t3:      #94A3B8;
+  --blue:    #1E6FD9;
+  --blueL:   #EFF6FF;
+  --blueM:   #BFDBFE;
+  --green:   #059669;
+  --greenL:  #ECFDF5;
+  --red:     #DC2626;
+  --redL:    #FEF2F2;
+  --amber:   #D97706;
+  --amberL:  #FFFBEB;
+  --purple:  #7C3AED;
+  --purpleL: #F5F3FF;
+  --teal:    #0891B2;
+  --tealL:   #F0FDFA;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--t1); font-size: 13px; line-height: 1.5; }
+
+/* ── 스크롤바 ── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--sub); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+/* ── 공통 ── */
+.card { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; box-shadow: 0 1px 4px rgba(15,23,42,.06); }
+.chip { display:inline-flex; align-items:center; font-size:10px; font-weight:700; padding:2px 8px; border-radius:4px; letter-spacing:.03em; }
+.btn { padding:9px 18px; border-radius:6px; font-family:inherit; font-size:12px; font-weight:600; cursor:pointer; transition:all .15s; border:none; }
+.btn-primary { background:var(--blue); color:#fff; }
+.btn-primary:hover { background:#1558B0; }
+.btn-primary:disabled { background:var(--sub); color:var(--t3); cursor:default; }
+.btn-success { background:var(--green); color:#fff; }
+.btn-success:hover { background:#047857; }
+.btn-ghost { background:#fff; color:var(--t2); border:1px solid var(--border2); }
+.btn-ghost:hover { background:var(--sub); }
+.sec-title { font-size:13px; font-weight:700; color:var(--t1); margin-bottom:3px; }
+.sec-sub   { font-size:11px; color:var(--t3); margin-bottom:14px; }
+input[type=range] { height:4px; border-radius:2px; cursor:pointer; }
+input[type=checkbox] { cursor:pointer; }
+table { width:100%; border-collapse:collapse; font-size:12px; }
+th { padding:7px 10px; color:var(--t2); text-align:right; font-weight:600; font-size:11px; border-bottom:1px solid var(--border); background:var(--sub); }
+td { padding:8px 10px; text-align:right; border-bottom:1px solid var(--border); }
+.dot { display:inline-block; width:8px; height:8px; border-radius:2px; margin-right:6px; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+.fade-in { animation:fadeIn .25s ease; }
+@keyframes spin { to{transform:rotate(360deg)} }
+.spinner { display:inline-block; width:14px; height:14px; border:2px solid var(--blueM); border-top-color:var(--blue); border-radius:50%; animation:spin .7s linear infinite; vertical-align:middle; margin-right:6px; }
+
+/* ── 네비 ── */
+#nav { position:sticky; top:0; z-index:200; background:#fff; border-bottom:1px solid var(--border); padding:0 28px; box-shadow:0 1px 0 rgba(15,23,42,.05); display:flex; align-items:center; justify-content:space-between; height:52px; }
+#nav .logo { display:flex; align-items:center; gap:12px; }
+#nav .logo-icon { width:32px; height:32px; background:var(--blue); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; }
+#nav .logo-text { font-size:14px; font-weight:800; letter-spacing:-.3px; }
+#nav .logo-sub { font-size:11px; color:var(--t3); margin-left:10px; }
+#nav .status { display:flex; align-items:center; gap:6px; font-size:11px; color:var(--t2); font-weight:500; }
+#nav .status .dot-live { width:7px; height:7px; border-radius:50%; background:var(--green); }
+.demo-badge { background:#FEF3C7; color:#92400E; border:1px solid #FDE68A; border-radius:4px; padding:3px 8px; font-size:10px; font-weight:700; margin-left:10px; }
+
+/* ── 대시보드 ── */
+#dashboard { background:#fff; border-bottom:1px solid var(--border); padding:20px 28px; }
+.dash-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+.dash-subtitle { font-size:11px; font-weight:700; color:var(--blue); letter-spacing:.08em; text-transform:uppercase; margin-bottom:3px; }
+.dash-title { font-size:20px; font-weight:800; letter-spacing:-.4px; }
+.kpi-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:14px; }
+.kpi-card { background:#fff; border:1px solid var(--border); border-radius:10px; padding:14px 16px; box-shadow:0 1px 3px rgba(15,23,42,.05); }
+.kpi-label { font-size:11px; color:var(--t2); font-weight:600; letter-spacing:.02em; margin-bottom:4px; }
+.kpi-val { font-size:22px; font-weight:800; font-variant-numeric:tabular-nums; }
+.kpi-sub { font-size:10px; color:var(--t3); margin-top:2px; }
+.kpi-delta { margin-top:5px; font-size:11px; font-weight:700; }
+.dash-bottom { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.mini-bar-row { display:flex; align-items:center; gap:8px; margin-bottom:7px; }
+.mini-bar-label { width:90px; font-size:11px; color:var(--t1); font-weight:500; flex-shrink:0; }
+.mini-bar-track { flex:1; height:5px; background:var(--sub); border-radius:3px; overflow:hidden; }
+.mini-bar-fill { height:100%; border-radius:3px; transition:width .8s ease; }
+.mini-bar-val { width:36px; font-size:11px; font-weight:700; text-align:right; flex-shrink:0; }
+.status-row { display:flex; align-items:center; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--border); font-size:11px; }
+
+/* ── 탭 영역 ── */
+.tab-bar { background:#fff; border-bottom:1px solid var(--border); padding:0 28px; display:flex; }
+.tab-btn { padding:12px 20px; border:none; background:transparent; cursor:pointer; font-family:inherit; border-bottom:2px solid transparent; margin-bottom:-1px; }
+.tab-btn.active { border-bottom-color:var(--blue); }
+.tab-btn .tb-label { font-size:13px; font-weight:700; color:var(--t2); }
+.tab-btn.active .tb-label { color:var(--blue); }
+.tab-btn .tb-sub { font-size:10px; color:var(--t3); margin-top:1px; }
+
+/* ── 단계 탭 ── */
+.step-bar { background:#fff; border-bottom:1px solid var(--border); padding:0 28px; display:flex; overflow-x:auto; }
+.step-btn { display:flex; align-items:center; gap:7px; padding:10px 14px; border:none; background:transparent; cursor:pointer; font-family:inherit; border-bottom:2px solid transparent; white-space:nowrap; margin-bottom:-1px; }
+.step-btn.active { border-bottom-color:var(--blue); }
+.step-circle { width:18px; height:18px; border-radius:50%; font-size:9px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.step-circle.done { background:var(--green); color:#fff; }
+.step-circle.active { background:var(--blue); color:#fff; }
+.step-circle.inactive { background:var(--sub); color:var(--t3); }
+.step-btn-label { font-size:12px; font-weight:500; color:var(--t2); }
+.step-btn.active .step-btn-label { color:var(--blue); font-weight:700; }
+.step-btn.done .step-btn-label { color:var(--green); }
+
+/* ── 콘텐츠 ── */
+#content { max-width:860px; margin:0 auto; padding:24px 28px 60px; }
+.panel { display:none; }
+.panel.active { display:block; }
+.step-panel { display:none; }
+.step-panel.active { display:block; }
+.section { display:flex; flex-direction:column; gap:14px; }
+
+/* ── 슬라이더 영역 ── */
+.slider-row { margin-bottom:12px; }
+.slider-header { display:flex; justify-content:space-between; margin-bottom:5px; }
+.slider-label { font-size:12px; color:var(--t2); font-weight:500; }
+.slider-val { font-size:12px; font-weight:700; }
+.slider-range { display:flex; justify-content:space-between; font-size:10px; color:var(--t3); margin-top:2px; }
+
+/* ── 목표 설정 블록 ── */
+.target-block { padding:14px 16px; border-radius:8px; margin-bottom:10px; transition:all .2s; }
+.target-header { display:flex; align-items:center; gap:8px; }
+
+/* ── 진행 바 ── */
+.progress-wrap { margin-top:10px; }
+.progress-bar-track { height:5px; background:var(--sub); border-radius:3px; overflow:hidden; margin-top:4px; }
+.progress-bar-fill { height:100%; background:var(--blue); border-radius:3px; transition:width .1s linear; }
+
+/* ── 게이지 ── */
+.gauge-card { padding:14px 16px; background:var(--sub); border-radius:9px; border:1px solid var(--border); }
+.gauge-val { font-size:22px; font-weight:800; margin-top:4px; }
+.gauge-track { height:4px; background:var(--border); border-radius:2px; overflow:hidden; margin-top:6px; }
+.gauge-fill { height:100%; border-radius:2px; transition:width .8s ease; }
+.gauge-result { font-size:10px; font-weight:700; margin-top:3px; }
+
+/* ── 결과 배너 ── */
+.result-banner { padding:10px 14px; border-radius:7px; font-size:12px; font-weight:600; }
+
+/* ── 연동 아이템 ── */
+.connect-item { display:flex; align-items:center; gap:14px; padding:12px 16px; border-radius:8px; transition:all .25s; margin-bottom:8px; }
+
+/* ── 반응형 ── */
+@media(max-width:700px) {
+  .kpi-grid { grid-template-columns:repeat(2,1fr); }
+  .dash-bottom { grid-template-columns:1fr; }
+  #content { padding:16px 14px 60px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ────────────────────────── NAV ────────────────────────── -->
+<div id="nav">
+  <div class="logo">
+    <div class="logo-icon">🏦</div>
+    <div>
+      <span class="logo-text">AI Portfolio Manager</span>
+      <span class="logo-sub">NH농협은행</span>
+    </div>
+    <span class="demo-badge">DEMO</span>
+  </div>
+  <div class="status">
+    <div class="dot-live"></div>
+    AI Agent 활성 &nbsp;|&nbsp; 2024년말 공시 기준
+  </div>
+</div>
+
+<!-- ─────────────────────── DASHBOARD ─────────────────────── -->
+<div id="dashboard">
+  <div class="dash-header">
+    <div>
+      <div class="dash-subtitle">NH농협은행 · AI 전략적 포트폴리오 관리</div>
+      <div class="dash-title">Portfolio Intelligence Dashboard</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <div style="display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--greenL);border-radius:6px;border:1px solid #A7F3D0;">
+        <div style="width:7px;height:7px;border-radius:50%;background:var(--green);"></div>
+        <span style="font-size:11px;font-weight:600;color:var(--green);">시스템 정상 운영</span>
+      </div>
+      <div style="font-size:11px;color:var(--t3);padding:6px 12px;background:var(--sub);border-radius:6px;">기준일 2024.12</div>
+    </div>
+  </div>
+
+  <!-- KPI 4종 -->
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-label">전행 RoRWA</div>
+      <div class="kpi-val" style="color:var(--blue);" id="dash-rorwa">1.82%</div>
+      <div class="kpi-sub">위험가중자산수익률</div>
+      <div class="kpi-delta" id="dash-rorwa-delta" style="display:none;"></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">BIS 자기자본비율</div>
+      <div class="kpi-val" style="color:var(--purple);">18.64%</div>
+      <div class="kpi-sub">자기자본 35.0조 (2024 3Q)</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">LCR</div>
+      <div class="kpi-val" style="color:var(--green);">117.3%</div>
+      <div class="kpi-sub">HQLA 52.5조 · 규제 상회</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">총 RWA</div>
+      <div class="kpi-val" style="color:var(--teal);">187.9조</div>
+      <div class="kpi-sub">총자산 400조 (은행 단독)</div>
+    </div>
+  </div>
+
+  <!-- 하단 2열 -->
+  <div class="dash-bottom">
+    <div class="card" style="padding:14px 16px;">
+      <div style="font-size:11px;font-weight:700;color:var(--t2);margin-bottom:11px;letter-spacing:.02em;">상품군별 RoRWA 순위</div>
+      <div id="rorwa-bars"></div>
+    </div>
+    <div class="card" style="padding:14px 16px;" id="dash-right">
+      <div style="font-size:11px;font-weight:700;color:var(--t2);margin-bottom:11px;">시스템 현황</div>
+      <div>
+        <div class="status-row"><span><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:5px;"></span>LCR 규제 준수 (100%↑)</span><span style="font-weight:700;color:var(--green);">117.3%</span></div>
+        <div class="status-row"><span><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:5px;"></span>BIS 규제 준수 (8%↑)</span><span style="font-weight:700;color:var(--green);">18.64%</span></div>
+        <div class="status-row"><span><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:5px;"></span>고정이하여신비율</span><span style="font-weight:700;color:var(--green);">0.42%</span></div>
+        <div class="status-row"><span><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--amber);margin-right:5px;"></span>최적화 시뮬레이션</span><span style="font-weight:700;color:var(--amber);">미실행</span></div>
+        <div class="status-row" style="border:none;"><span><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--teal);margin-right:5px;"></span>NIM (2024년말)</span><span style="font-weight:700;color:var(--teal);">1.78%</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─────────────────────── MAIN TABS ─────────────────────── -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchMain('fwd',this)">
+    <div class="tb-label">📊 순방향 최적화</div>
+    <div class="tb-sub">자산 조정 → 지표 결과</div>
+  </button>
+  <button class="tab-btn" onclick="switchMain('inv',this)">
+    <div class="tb-label">🎯 역산 최적화</div>
+    <div class="tb-sub">목표 지표 → 최적 포트폴리오</div>
+  </button>
+</div>
+
+<!-- ─────────────────── FORWARD STEP TABS ─────────────────── -->
+<div id="step-bar" class="step-bar">
+  <button class="step-btn active" id="stab-s1" onclick="switchStep('s1')">
+    <div class="step-circle active" id="sci-s1">1</div>
+    <span class="step-btn-label">자연어 입력</span>
+  </button>
+  <button class="step-btn" id="stab-s2" onclick="switchStep('s2')">
+    <div class="step-circle inactive" id="sci-s2">2</div>
+    <span class="step-btn-label">데이터 집계</span>
+  </button>
+  <button class="step-btn" id="stab-s3" onclick="switchStep('s3')">
+    <div class="step-circle inactive" id="sci-s3">3</div>
+    <span class="step-btn-label">최적화 실행</span>
+  </button>
+  <button class="step-btn" id="stab-s4" onclick="switchStep('s4')">
+    <div class="step-circle inactive" id="sci-s4">4</div>
+    <span class="step-btn-label">리스크 분석</span>
+  </button>
+  <button class="step-btn" id="stab-s5" onclick="switchStep('s5')">
+    <div class="step-circle inactive" id="sci-s5">5</div>
+    <span class="step-btn-label">결과 보고</span>
+  </button>
+  <button class="step-btn" id="stab-s6" onclick="switchStep('s6')">
+    <div class="step-circle inactive" id="sci-s6">6</div>
+    <span class="step-btn-label">경영계획 연동</span>
+  </button>
+</div>
+
+<!-- ─────────────────────── CONTENT ─────────────────────── -->
+<div id="content">
+
+  <!-- ══ 순방향 패널 ══ -->
+  <div class="panel active" id="panel-fwd">
+
+    <!-- S1: 자연어 입력 -->
+    <div class="step-panel active fade-in" id="sp-s1">
+      <div class="section">
+        <div class="card">
+          <div class="sec-title">자연어 입력 및 의도 파악</div>
+          <div class="sec-sub">LLM이 자연어를 해석하여 시뮬레이션 파라미터로 구조화합니다 (데모: 사전 정의된 시나리오 분석)</div>
+          <textarea id="nlp-input" rows="3" placeholder="예: 중소기업대출 3조 확대, 무역금융 1.5조 확대, 주택담보 2조 축소 시 RoRWA 효과 분석해줘" style="width:100%;background:var(--sub);border:1px solid var(--border);border-radius:7px;color:var(--t1);font-size:13px;padding:11px 13px;resize:vertical;font-family:inherit;line-height:1.6;"></textarea>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;">
+            <button class="btn btn-ghost" style="font-size:11px;padding:4px 10px;" onclick="fillEx(0)">예시 1</button>
+            <button class="btn btn-ghost" style="font-size:11px;padding:4px 10px;" onclick="fillEx(1)">예시 2</button>
+            <button class="btn btn-ghost" style="font-size:11px;padding:4px 10px;" onclick="fillEx(2)">예시 3</button>
+          </div>
+          <div style="margin-top:12px;">
+            <button class="btn btn-primary" onclick="runNLP()">🤖 의도 파악 실행</button>
+          </div>
+        </div>
+        <div class="card fade-in" id="nlp-result" style="display:none;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+            <span class="chip" style="background:var(--greenL);color:var(--green);">✓ 의도 파악 완료</span>
+          </div>
+          <div id="nlp-intent" style="font-size:14px;font-weight:700;color:var(--t1);margin-bottom:14px;"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div>
+              <div style="font-size:11px;font-weight:700;color:var(--t2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em;">자산 증감 파라미터</div>
+              <div id="nlp-assets"></div>
+            </div>
+            <div>
+              <div style="font-size:11px;font-weight:700;color:var(--t2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em;">제약조건 & 목표</div>
+              <div id="nlp-constraints"></div>
+            </div>
+          </div>
+          <div style="margin-top:16px;"><button class="btn btn-success" onclick="goStep('s2')">다음 단계 진행 →</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S2: 데이터 집계 -->
+    <div class="step-panel fade-in" id="sp-s2">
+      <div class="section">
+        <div class="card">
+          <div class="sec-title">기초 데이터 집계 및 RoRWA 산출</div>
+          <div class="sec-sub">RoRWA·신용RWA·종합수익 시스템에서 기초 데이터를 집계합니다</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;" id="src-cards">
+            <div class="card" style="padding:12px 14px;text-align:center;transition:all .4s;" id="src-0"><div style="font-size:18px;margin-bottom:4px;">🏛️</div><div style="font-size:12px;font-weight:600;color:var(--t2);">RoRWA 시스템</div><div style="font-size:10px;color:var(--t3);">대기 중</div></div>
+            <div class="card" style="padding:12px 14px;text-align:center;transition:all .6s;" id="src-1"><div style="font-size:18px;margin-bottom:4px;">💳</div><div style="font-size:12px;font-weight:600;color:var(--t2);">신용RWA 시스템</div><div style="font-size:10px;color:var(--t3);">대기 중</div></div>
+            <div class="card" style="padding:12px 14px;text-align:center;transition:all .8s;" id="src-2"><div style="font-size:18px;margin-bottom:4px;">📊</div><div style="font-size:12px;font-weight:600;color:var(--t2);">종합수익 시스템</div><div style="font-size:10px;color:var(--t3);">대기 중</div></div>
+          </div>
+          <button class="btn btn-primary" id="s2-start-btn" onclick="startDataLoad()">📡 데이터 집계 시작</button>
+          <div id="s2-progress" style="display:none;margin-top:10px;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:11px;color:var(--t2);">데이터 집계 중...</span><span id="s2-pct" style="font-size:11px;font-weight:700;color:var(--blue);">0%</span></div>
+            <div class="progress-bar-track"><div class="progress-bar-fill" id="s2-bar" style="width:0%;"></div></div>
+          </div>
+        </div>
+        <div class="card fade-in" id="s2-result" style="display:none;">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border);">
+            <div style="text-align:center;"><div style="font-size:11px;color:var(--t3);margin-bottom:4px;">전행 RoRWA</div><div style="font-size:22px;font-weight:800;color:var(--blue);">1.82%</div></div>
+            <div style="text-align:center;"><div style="font-size:11px;color:var(--t3);margin-bottom:4px;">총 RWA</div><div style="font-size:22px;font-weight:800;color:var(--purple);">187.9조</div></div>
+            <div style="text-align:center;"><div style="font-size:11px;color:var(--t3);margin-bottom:4px;">BIS 비율</div><div style="font-size:22px;font-weight:800;color:var(--green);">18.64%</div></div>
+          </div>
+          <div style="font-size:11px;font-weight:700;color:var(--t2);margin-bottom:10px;text-transform:uppercase;letter-spacing:.04em;">상품군별 RoRWA 현황 (2024년말 공시 기반)</div>
+          <table>
+            <thead><tr><th style="text-align:left;">순위</th><th style="text-align:left;">자산군</th><th>RoRWA</th><th>RWA (조)</th><th>이자수익 (억)</th><th>평균RW</th></tr></thead>
+            <tbody id="s2-table"></tbody>
+          </table>
+          <div style="margin-top:16px;"><button class="btn btn-success" onclick="goStep('s3')">다음 단계 진행 →</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S3: 최적화 -->
+    <div class="step-panel fade-in" id="sp-s3">
+      <div class="section">
+        <div class="card">
+          <div class="sec-title">순방향 포트폴리오 최적화 시뮬레이션</div>
+          <div class="sec-sub">제약조건 설정 후 AI 최적화 엔진으로 최적 자산배분안을 도출합니다</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+            <div class="slider-row">
+              <div class="slider-header"><span class="slider-label">총자산 증가 한도</span><span class="slider-val" id="sv-growth" style="color:var(--blue);">5조</span></div>
+              <input type="range" min="10000" max="300000" step="10000" value="50000" style="width:100%;accent-color:var(--blue);" oninput="document.getElementById('sv-growth').textContent=(this.value/10000).toFixed(0)+'조'">
+              <div class="slider-range"><span>1조</span><span>30조</span></div>
+            </div>
+            <div class="slider-row">
+              <div class="slider-header"><span class="slider-label">RWA Cap</span><span class="slider-val" id="sv-rwa" style="color:var(--blue);">20조</span></div>
+              <input type="range" min="50000" max="500000" step="10000" value="200000" style="width:100%;accent-color:var(--blue);" oninput="document.getElementById('sv-rwa').textContent=(this.value/10000).toFixed(0)+'조'">
+              <div class="slider-range"><span>5조</span><span>50조</span></div>
+            </div>
+            <div class="slider-row">
+              <div class="slider-header"><span class="slider-label">자산군 최소 비중</span><span class="slider-val" id="sv-min" style="color:var(--blue);">3%</span></div>
+              <input type="range" min="1" max="10" step="1" value="3" style="width:100%;accent-color:var(--blue);" oninput="document.getElementById('sv-min').textContent=this.value+'%'">
+              <div class="slider-range"><span>1%</span><span>10%</span></div>
+            </div>
+            <div class="slider-row">
+              <div class="slider-header"><span class="slider-label">자산군 최대 비중</span><span class="slider-val" id="sv-max" style="color:var(--blue);">45%</span></div>
+              <input type="range" min="25" max="55" step="5" value="45" style="width:100%;accent-color:var(--blue);" oninput="document.getElementById('sv-max').textContent=this.value+'%'">
+              <div class="slider-range"><span>25%</span><span>55%</span></div>
+            </div>
+          </div>
+          <button class="btn" id="s3-run-btn" style="background:#7C3AED;color:#fff;" onclick="runOptimize()">🚀 AI 최적화 실행</button>
+          <div id="s3-progress" style="display:none;margin-top:10px;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:11px;color:var(--t2);"><span class="spinner"></span>최적화 실행 중...</span><span id="s3-iter" style="font-size:11px;font-weight:700;color:#7C3AED;">0회 반복</span></div>
+            <div class="progress-bar-track"><div class="progress-bar-fill" id="s3-bar" style="width:0%;background:#7C3AED;"></div></div>
+          </div>
+        </div>
+        <div class="card fade-in" id="s3-result" style="display:none;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="chip" style="background:var(--greenL);color:var(--green);">✓ 최적화 완료</span>
+              <span style="font-size:13px;font-weight:700;">최적 자산배분안 도출</span>
+            </div>
+            <div style="text-align:center;padding:8px 16px;background:var(--greenL);border-radius:7px;border:1px solid #A7F3D0;">
+              <div style="font-size:10px;color:var(--t3);">RoRWA 개선폭</div>
+              <div style="font-size:20px;font-weight:800;color:var(--green);">+16bp</div>
+            </div>
+          </div>
+          <table>
+            <thead><tr><th style="text-align:left;">자산군</th><th>현재 RoRWA</th><th>최적 증감</th><th>조정 후 RoRWA</th><th>방향</th></tr></thead>
+            <tbody id="s3-table"></tbody>
+          </table>
+          <div class="result-banner" style="margin-top:12px;background:var(--greenL);border:1px solid #A7F3D0;color:var(--green);">
+            💡 중소기업대출 3조↑ · 무역금융 1.5조↑ · 가계-신용 1조↑ · 주택담보 2조↓ · 기업대-일반 1.5조↓ 시<br>
+            전행 RoRWA 1.82% → 1.98% (+16bp) 달성 — DSR 3단계 규제 대응 및 기술금융 확대 기조 반영
+          </div>
+          <div style="margin-top:14px;"><button class="btn btn-success" onclick="goStep('s4')">다음 단계 진행 →</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S4: 리스크 분석 -->
+    <div class="step-panel fade-in" id="sp-s4">
+      <div class="section">
+        <div class="card">
+          <div class="sec-title">금리·유동성 리스크 분석</div>
+          <div class="sec-sub">ALM 시스템 연동 — 만기구간별 금리 및 유동성 영향 분석 (2024년 상반기 공시 기반)</div>
+          <div style="display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:16px;">
+            <button class="tab-btn active" id="risk-tab-ir" style="padding:8px 14px;" onclick="switchRisk('ir')"><span style="font-size:12px;font-weight:700;">📈 금리리스크 (△EVE/NII)</span></button>
+            <button class="tab-btn" id="risk-tab-liq" style="padding:8px 14px;" onclick="switchRisk('liq')"><span style="font-size:12px;font-weight:700;">💧 유동성리스크 (LCR)</span></button>
+          </div>
+          <div id="risk-ir">
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px;">
+              <div class="card" style="padding:12px 14px;background:var(--sub);"><div style="font-size:11px;font-weight:700;color:var(--t2);margin-bottom:8px;">1개월</div><div style="font-size:11px;color:var(--t3);margin-bottom:2px;">단순GAP</div><div style="font-size:13px;font-weight:700;color:var(--red);">-5.2조</div><div style="font-size:10px;color:var(--t3);margin-top:6px;">NII <span style="color:var(--red);font-weight:700;">-890억</span></div><div style="font-size:10px;color:var(--t3);">△EVE <span style="color:var(--red);font-weight:700;">-3,200억</span></div></div>
+              <div class="card" style="padding:12px 14px;background:var(--sub);"><div style="font-size:11px;font-weight:700;color:var(--t2);margin-bottom:8px;">3개월</div><div style="font-size:11px;color:var(--t3);margin-bottom:2px;">단순GAP</div><div style="font-size:13px;font-weight:700;color:var(--green);">+3.9조</div><div style="font-size:10px;color:var(--t3);margin-top:6px;">NII <span style="color:var(--green);font-weight:700;">+620억</span></div><div style="font-size:10px;color:var(--t3);">△EVE <span style="color:var(--red);font-weight:700;">-1,840억</span></div></div>
+              <div class="card" style="padding:12px 14px;background:var(--sub);"><div style="font-size:11px;font-weight:700;color:var(--t2);margin-bottom:8px;">6개월</div><div style="font-size:11px;color:var(--t3);margin-bottom:2px;">단순GAP</div><div style="font-size:13px;font-weight:700;color:var(--green);">+9.1조</div><div style="font-size:10px;color:var(--t3);margin-top:6px;">NII <span style="color:var(--green);font-weight:700;">+1,480억</span></div><div style="font-size:10px;color:var(--t3);">△EVE <span style="color:var(--red);font-weight:700;">-760억</span></div></div>
+              <div class="card" style="padding:12px 14px;background:var(--sub);"><div style="font-size:11px;font-weight:700;color:var(--t2);margin-bottom:8px;">1년</div><div style="font-size:11px;color:var(--t3);margin-bottom:2px;">단순GAP</div><div style="font-size:13px;font-weight:700;color:var(--red);">-2.2조</div><div style="font-size:10px;color:var(--t3);margin-top:6px;">NII <span style="color:var(--red);font-weight:700;">-310억</span></div><div style="font-size:10px;color:var(--t3);">△EVE <span style="color:var(--green);font-weight:700;">+420억</span></div></div>
+            </div>
+            <div class="result-banner" style="background:var(--redL);border:1px solid #FCA5A5;color:var(--red);">⚠️ 1개월 단기 GAP -5.2조 / △EVE -3,200억 (금리+100bp 충격) → 단기 금리 리프라이싱 리스크 모니터링 강화 필요</div>
+          </div>
+          <div id="risk-liq" style="display:none;">
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px;">
+              <div class="card" style="padding:12px 14px;background:var(--sub);"><div style="font-size:11px;font-weight:700;color:var(--t2);margin-bottom:6px;">1개월</div><div style="font-size:22px;font-weight:800;color:var(--green);">112%</div><div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:6px;"><div style="width:87%;height:100%;background:var(--green);border-radius:2px;"></div></div><div style="font-size:10px;font-weight:700;color:var(--green);margin-top:3px;">충족</div></div>
+              <div class="card" style="padding:12px 14px;background:var(--sub);"><div style="font-size:11px;font-weight:700;color:var(--t2);margin-bottom:6px;">3개월</div><div style="font-size:22px;font-weight:800;color:var(--green);">118%</div><div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:6px;"><div style="width:92%;height:100%;background:var(--green);border-radius:2px;"></div></div><div style="font-size:10px;font-weight:700;color:var(--green);margin-top:3px;">충족</div></div>
+              <div class="card" style="padding:12px 14px;background:var(--sub);"><div style="font-size:11px;font-weight:700;color:var(--t2);margin-bottom:6px;">6개월</div><div style="font-size:22px;font-weight:800;color:var(--green);">124%</div><div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:6px;"><div style="width:97%;height:100%;background:var(--green);border-radius:2px;"></div></div><div style="font-size:10px;font-weight:700;color:var(--green);margin-top:3px;">충족</div></div>
+              <div class="card" style="padding:12px 14px;background:var(--sub);"><div style="font-size:11px;font-weight:700;color:var(--t2);margin-bottom:6px;">1년</div><div style="font-size:22px;font-weight:800;color:var(--green);">131%</div><div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:6px;"><div style="width:100%;height:100%;background:var(--green);border-radius:2px;"></div></div><div style="font-size:10px;font-weight:700;color:var(--green);margin-top:3px;">충족</div></div>
+            </div>
+            <div class="result-banner" style="background:var(--greenL);border:1px solid #A7F3D0;color:var(--green);">✅ 전 만기 구간 LCR 100% 이상 충족 (1개월 112% · HQLA 52.5조 기반) — 스트레스 상황에서도 한 달 간 자금소요 대응 가능 수준 유지</div>
+          </div>
+          <div style="margin-top:14px;display:flex;gap:8px;" id="s4-btns">
+            <button class="btn btn-primary" id="s4-confirm-btn" onclick="confirmRisk()">분석 확인 완료</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S5: 결과 보고 -->
+    <div class="step-panel fade-in" id="sp-s5">
+      <div class="section">
+        <div class="card">
+          <div class="sec-title">결과 출력 및 자연어 보고서</div>
+          <div class="sec-sub">최적화 시뮬레이션 결과를 경영진 보고용으로 출력합니다</div>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px;">
+            <div style="padding:12px 14px;background:var(--sub);border-radius:8px;border:1px solid var(--border);"><div style="font-size:11px;color:var(--t2);margin-bottom:3px;">RoRWA 개선폭</div><div style="font-size:20px;font-weight:800;color:var(--green);">+16bp</div><div style="font-size:10px;color:var(--t3);margin-top:2px;">1.82% → 1.98% (2024년말 기준)</div></div>
+            <div style="padding:12px 14px;background:var(--sub);border-radius:8px;border:1px solid var(--border);"><div style="font-size:11px;color:var(--t2);margin-bottom:3px;">자산 이동 규모</div><div style="font-size:20px;font-weight:800;color:var(--blue);">약 4조</div><div style="font-size:10px;color:var(--t3);margin-top:2px;">중기↑3조·무역↑1.5조·주담↓2조</div></div>
+            <div style="padding:12px 14px;background:var(--sub);border-radius:8px;border:1px solid var(--border);"><div style="font-size:11px;color:var(--t2);margin-bottom:3px;">단기 LCR</div><div style="font-size:20px;font-weight:800;color:var(--teal);">112%</div><div style="font-size:10px;color:var(--t3);margin-top:2px;">1개월 — 규제(100%) 상회 유지</div></div>
+            <div style="padding:12px 14px;background:var(--sub);border-radius:8px;border:1px solid var(--border);"><div style="font-size:11px;color:var(--t2);margin-bottom:3px;">△EVE 노출</div><div style="font-size:20px;font-weight:800;color:var(--amber);">-3,200억</div><div style="font-size:10px;color:var(--t3);margin-top:2px;">1개월 구간 (금리+100bp 충격)</div></div>
+          </div>
+          <button class="btn btn-primary" id="s5-report-btn" onclick="genReport()">🤖 AI 자연어 보고서 생성</button>
+          <div id="s5-report" style="display:none;margin-top:14px;padding:14px 16px;background:var(--blueL);border:1px solid var(--blueM);border-radius:8px;font-size:13px;color:var(--t1);line-height:1.7;" class="fade-in">
+            <div style="font-size:11px;font-weight:700;color:var(--blue);margin-bottom:6px;">🤖 AI 경영진 보고서 (데모)</div>
+            <p>2024년말 공시 기준, NH농협은행의 전행 RoRWA는 1.82%로, DSR 3단계 규제 대응을 위한 주택담보대출 2조 축소와 기업대-일반 1.5조 축소를 통해 RWA 효율성을 개선하였습니다.</p>
+            <p style="margin-top:8px;">중소기업대출 3조 확대(기술금융 20조 돌파 기조 유지), 무역금융 1.5조 확대, 가계-신용 1조 확대를 통해 고RoRWA 자산군 비중을 확대함으로써 전행 RoRWA를 1.98%(+16bp)로 개선할 수 있을 것으로 추정됩니다.</p>
+            <p style="margin-top:8px;">BIS 18.64% 및 LCR 117.3%의 우수한 건전성 지표를 유지하면서, 단기(1개월) △EVE -3,200억 노출에 대한 ALM 관리를 강화할 것을 권고합니다.</p>
+          </div>
+          <div id="s5-next" style="display:none;margin-top:14px;"><button class="btn btn-success" onclick="goStep('s6')">다음 단계 진행 →</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S6: 경영계획 연동 -->
+    <div class="step-panel fade-in" id="sp-s6">
+      <div class="section">
+        <div class="card">
+          <div class="sec-title">경영계획 연동 및 운영 확장</div>
+          <div class="sec-sub">최적 포트폴리오 결과를 경영 시스템에 연동하고 운영계로 이관합니다</div>
+          <div id="connect-items" style="margin-bottom:16px;">
+            <div class="connect-item" id="ci-mgmt" style="background:var(--sub);border:1px solid var(--border);">
+              <span style="font-size:20px;">📋</span>
+              <div style="flex:1;"><div style="font-size:13px;font-weight:600;color:var(--t1);">경영계획 수립 연동</div><div style="font-size:11px;color:var(--t3);margin-top:1px;">최적 자산배분안 → 차년도 경영계획 반영</div></div>
+              <button class="btn btn-primary" style="font-size:11px;padding:6px 14px;" onclick="connectItem('mgmt',this,var(--blue))">연동 실행</button>
+            </div>
+            <div class="connect-item" id="ci-lim" style="background:var(--sub);border:1px solid var(--border);">
+              <span style="font-size:20px;">🎯</span>
+              <div style="flex:1;"><div style="font-size:13px;font-weight:600;color:var(--t1);">익스포져·내부자본 한도</div><div style="font-size:11px;color:var(--t3);margin-top:1px;">RWA 한도 및 익스포져 설정 연동</div></div>
+              <button class="btn btn-primary" style="font-size:11px;padding:6px 14px;background:var(--purple);" onclick="connectItem('lim',this,'var(--purple)')">연동 실행</button>
+            </div>
+            <div class="connect-item" id="ci-api" style="background:var(--sub);border:1px solid var(--border);">
+              <span style="font-size:20px;">🌐</span>
+              <div style="flex:1;"><div style="font-size:13px;font-weight:600;color:var(--t1);">환율·금리 API 연동</div><div style="font-size:11px;color:var(--t3);margin-top:1px;">시장리스크 변수 실시간 API 연계</div></div>
+              <button class="btn btn-primary" style="font-size:11px;padding:6px 14px;background:var(--teal);" onclick="connectItem('api',this,'var(--teal)')">연동 실행</button>
+            </div>
+            <div class="connect-item" id="ci-gov" style="background:var(--sub);border:1px solid var(--border);">
+              <span style="font-size:20px;">🔒</span>
+              <div style="flex:1;"><div style="font-size:13px;font-weight:600;color:var(--t1);">AI 거버넌스 검증</div><div style="font-size:11px;color:var(--t3);margin-top:1px;">신뢰성 검증 통과 후 운영계 이관 완료</div></div>
+              <button class="btn btn-primary" style="font-size:11px;padding:6px 14px;background:var(--green);" onclick="connectItem('gov',this,'var(--green)')">연동 실행</button>
+            </div>
+          </div>
+          <div id="s6-done" style="display:none;padding:16px 20px;background:var(--greenL);border:1px solid #A7F3D0;border-radius:10px;text-align:center;" class="fade-in">
+            <div style="font-size:24px;margin-bottom:6px;">🎉</div>
+            <div style="font-size:15px;font-weight:800;color:var(--green);margin-bottom:3px;">AI 포트폴리오 관리 Agent 운영 준비 완료</div>
+            <div style="font-size:12px;color:var(--t2);">6단계 전체 완료 · 경영계획 연동 · 운영계 이관 완료</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /panel-fwd -->
+
+  <!-- ══ 역산 패널 ══ -->
+  <div class="panel" id="panel-inv">
+    <div class="section">
+
+      <!-- 현재 기준값 -->
+      <div class="card">
+        <div class="sec-title">현재 기준 지표</div>
+        <div class="sec-sub">NH농협은행 2024년말 공시 기반</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+          <div style="text-align:center;padding:12px;background:var(--sub);border-radius:8px;border:1px solid var(--border);"><div style="font-size:11px;color:var(--t2);margin-bottom:3px;">RoRWA</div><div style="font-size:22px;font-weight:800;color:var(--blue);">1.82%</div><div style="font-size:10px;color:var(--t3);margin-top:2px;">현재값</div></div>
+          <div style="text-align:center;padding:12px;background:var(--sub);border-radius:8px;border:1px solid var(--border);"><div style="font-size:11px;color:var(--t2);margin-bottom:3px;">BIS 비율</div><div style="font-size:22px;font-weight:800;color:var(--purple);">18.64%</div><div style="font-size:10px;color:var(--t3);margin-top:2px;">현재값</div></div>
+          <div style="text-align:center;padding:12px;background:var(--sub);border-radius:8px;border:1px solid var(--border);"><div style="font-size:11px;color:var(--t2);margin-bottom:3px;">LCR</div><div style="font-size:22px;font-weight:800;color:var(--teal);">117.3%</div><div style="font-size:10px;color:var(--t3);margin-top:2px;">현재값</div></div>
+        </div>
+      </div>
+
+      <!-- 목표값 설정 -->
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <div><div class="sec-title">목표값 설정</div><div class="sec-sub" style="margin-bottom:0;">달성하고자 하는 목표 지표를 설정하세요</div></div>
+          <div style="display:flex;gap:4px;">
+            <button id="mode-bp" class="btn" style="padding:5px 12px;font-size:11px;font-weight:600;background:var(--blueL);color:var(--blue);border:1px solid var(--blueM);" onclick="setMode('bp')">bp 단위</button>
+            <button id="mode-abs" class="btn btn-ghost" style="padding:5px 12px;font-size:11px;font-weight:600;" onclick="setMode('abs')">절대값</button>
+          </div>
+        </div>
+
+        <!-- RoRWA 목표 -->
+        <div class="target-block" id="tb-rorwa" style="background:var(--blueL);border:1px solid var(--blueM);">
+          <div class="target-header">
+            <input type="checkbox" id="chk-rorwa" checked onchange="updateTargetUI()" style="accent-color:var(--blue);width:14px;height:14px;">
+            <span style="font-size:13px;font-weight:600;color:var(--blue);">📈 RoRWA 목표 설정</span>
+            <span class="chip" style="background:var(--sub);color:var(--t3);margin-left:auto;">현재 1.82%</span>
+          </div>
+          <div id="rorwa-slider-area" style="margin-top:12px;">
+            <div id="rorwa-bp-area">
+              <div class="slider-header"><span class="slider-label">개선 목표</span><span class="slider-val" id="rorwa-bp-disp" style="color:var(--blue);">+20bp → 목표 <strong>2.02%</strong></span></div>
+              <input type="range" min="5" max="30" step="1" value="20" id="sl-rorwa-bp" style="width:100%;accent-color:var(--blue);" oninput="updateBpDisp('rorwa')">
+              <div class="slider-range"><span>5bp</span><span>30bp</span></div>
+            </div>
+            <div id="rorwa-abs-area" style="display:none;">
+              <div class="slider-header"><span class="slider-label">목표 RoRWA</span><span class="slider-val" id="rorwa-abs-disp" style="color:var(--blue);">2.00%</span></div>
+              <input type="range" min="185" max="220" step="1" value="200" id="sl-rorwa-abs" style="width:100%;accent-color:var(--blue);" oninput="document.getElementById('rorwa-abs-disp').textContent=(this.value/100).toFixed(2)+'%'">
+              <div class="slider-range"><span>1.85%</span><span>2.20%</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BIS 목표 -->
+        <div class="target-block" id="tb-bis" style="background:var(--sub);border:1px solid var(--border);">
+          <div class="target-header">
+            <input type="checkbox" id="chk-bis" onchange="updateTargetUI()" style="accent-color:var(--purple);width:14px;height:14px;">
+            <span style="font-size:13px;font-weight:600;color:var(--t2);">🏛️ BIS 비율 목표 설정</span>
+            <span class="chip" style="background:var(--sub);color:var(--t3);margin-left:auto;">현재 18.64%</span>
+          </div>
+          <div id="bis-slider-area" style="display:none;margin-top:12px;">
+            <div id="bis-bp-area">
+              <div class="slider-header"><span class="slider-label">개선 목표</span><span class="slider-val" id="bis-bp-disp" style="color:var(--purple);">+20bp → 목표 <strong>18.84%</strong></span></div>
+              <input type="range" min="10" max="100" step="5" value="20" id="sl-bis-bp" style="width:100%;accent-color:var(--purple);" oninput="updateBpDisp('bis')">
+              <div class="slider-range"><span>10bp</span><span>100bp</span></div>
+            </div>
+            <div id="bis-abs-area" style="display:none;">
+              <div class="slider-header"><span class="slider-label">목표 BIS</span><span class="slider-val" id="bis-abs-disp" style="color:var(--purple);">19.00%</span></div>
+              <input type="range" min="1850" max="2000" step="5" value="1900" id="sl-bis-abs" style="width:100%;accent-color:var(--purple);" oninput="document.getElementById('bis-abs-disp').textContent=(this.value/100).toFixed(2)+'%'">
+              <div class="slider-range"><span>18.50%</span><span>20.00%</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LCR 목표 -->
+        <div class="target-block" id="tb-lcr" style="background:var(--sub);border:1px solid var(--border);">
+          <div class="target-header">
+            <input type="checkbox" id="chk-lcr" onchange="updateTargetUI()" style="accent-color:var(--teal);width:14px;height:14px;">
+            <span style="font-size:13px;font-weight:600;color:var(--t2);">💧 LCR 목표 설정</span>
+            <span class="chip" style="background:var(--sub);color:var(--t3);margin-left:auto;">현재 117.3%</span>
+          </div>
+          <div id="lcr-slider-area" style="display:none;margin-top:12px;">
+            <div id="lcr-bp-area">
+              <div class="slider-header"><span class="slider-label">개선 목표</span><span class="slider-val" id="lcr-bp-disp" style="color:var(--teal);">+300bp → 목표 <strong>120.3%</strong></span></div>
+              <input type="range" min="50" max="500" step="50" value="300" id="sl-lcr-bp" style="width:100%;accent-color:var(--teal);" oninput="updateBpDisp('lcr')">
+              <div class="slider-range"><span>50bp</span><span>500bp</span></div>
+            </div>
+            <div id="lcr-abs-area" style="display:none;">
+              <div class="slider-header"><span class="slider-label">목표 LCR</span><span class="slider-val" id="lcr-abs-disp" style="color:var(--teal);">120.0%</span></div>
+              <input type="range" min="11800" max="13000" step="50" value="12000" id="sl-lcr-abs" style="width:100%;accent-color:var(--teal);" oninput="document.getElementById('lcr-abs-disp').textContent=(this.value/100).toFixed(1)+'%'">
+              <div class="slider-range"><span>118%</span><span>130%</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 제약조건 -->
+        <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div class="slider-row">
+            <div class="slider-header"><span class="slider-label">최대 자산 이동 한도</span><span class="slider-val" id="sv-maxdelta" style="color:var(--amber);">30조</span></div>
+            <input type="range" min="50000" max="1000000" step="50000" value="300000" style="width:100%;accent-color:var(--amber);" oninput="document.getElementById('sv-maxdelta').textContent=(this.value/10000).toFixed(0)+'조'">
+            <div class="slider-range"><span>5조</span><span>100조</span></div>
+          </div>
+          <div>
+            <div style="font-size:12px;color:var(--t2);margin-bottom:7px;">고정 자산군 (변경 불가)</div>
+            <div style="display:flex;flex-wrap:wrap;gap:5px;" id="lock-btns"></div>
+          </div>
+        </div>
+
+        <div style="margin-top:16px;">
+          <button class="btn" id="inv-run-btn" style="width:100%;padding:11px;background:var(--blue);color:#fff;font-size:13px;font-weight:700;" onclick="runInverse()">🎯 목표값 역산 최적화 실행</button>
+          <div id="inv-progress" style="display:none;margin-top:10px;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:11px;color:var(--t2);"><span class="spinner"></span>역산 최적화 중...</span><span id="inv-iter" style="font-size:11px;font-weight:700;color:var(--blue);">0회 반복</span></div>
+            <div class="progress-bar-track"><div class="progress-bar-fill" id="inv-bar" style="width:0%;"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 역산 결과 -->
+      <div class="card fade-in" id="inv-result" style="display:none;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+          <span class="chip" style="background:var(--greenL);color:var(--green);">✓ 역산 최적화 완료</span>
+          <span style="font-size:13px;font-weight:700;">목표 달성 포트폴리오 도출</span>
+        </div>
+        <!-- 게이지 3종 -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;" id="inv-gauges"></div>
+        <!-- 조정안 테이블 -->
+        <div style="font-size:12px;font-weight:700;color:var(--t2);margin-bottom:10px;text-transform:uppercase;letter-spacing:.04em;">최적 자산 조정안 — 금액 · 비중 · RWA 변동</div>
+        <div style="overflow-x:auto;margin-bottom:14px;">
+          <table id="inv-table">
+            <thead><tr><th style="text-align:left;">자산군</th><th>현재 잔액</th><th>조정 후 잔액</th><th>증감액</th><th>비중 변동</th><th>RWA 변동</th><th>방향</th></tr></thead>
+            <tbody id="inv-tbody"></tbody>
+          </table>
+        </div>
+        <!-- 요약 KPI -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;" id="inv-kpis"></div>
+        <!-- AI 코멘트 -->
+        <button class="btn btn-primary" id="inv-comment-btn" onclick="genInvComment()">🤖 AI 경영진 코멘트 생성</button>
+        <div id="inv-comment" style="display:none;margin-top:12px;padding:14px 16px;background:var(--blueL);border:1px solid var(--blueM);border-radius:8px;font-size:13px;color:var(--t1);line-height:1.7;" class="fade-in">
+          <div style="font-size:11px;font-weight:700;color:var(--blue);margin-bottom:5px;">🤖 AI 코멘트 (데모)</div>
+          <div id="inv-comment-text"></div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /panel-inv -->
+
+</div><!-- /content -->
+
+<script>
+// ────────── DATA ──────────
+const BASE = { rorwa:1.82, bis:18.64, lcr:117.3, equity:350420, totalAsset:4000000 };
+const ASSETS = [
+  { id:"sme",    name:"중소기업대출",     rorwa:2.18, rwa:530000, interest:11448, rw:75,  balance:706700,  lcrW:0.04, color:"#1E6FD9" },
+  { id:"corp_s", name:"기업대-담보/보증", rorwa:1.74, rwa:490000, interest:8526,  rw:80,  balance:612500,  lcrW:0.06, color:"#0891B2" },
+  { id:"trade",  name:"무역금융",         rorwa:3.12, rwa:96000,  interest:2995,  rw:50,  balance:192000,  lcrW:0.10, color:"#059669" },
+  { id:"house",  name:"주택담보대출",     rorwa:1.45, rwa:350000, interest:5075,  rw:35,  balance:1000000, lcrW:0.02, color:"#7C3AED" },
+  { id:"corp_g", name:"기업대-일반",      rorwa:1.92, rwa:280000, interest:5376,  rw:100, balance:280000,  lcrW:0.05, color:"#D97706" },
+  { id:"hh",     name:"가계-신용/기타",   rorwa:3.87, rwa:163000, interest:6312,  rw:75,  balance:217300,  lcrW:0.03, color:"#DC2626" },
+];
+const EXAMPLES = [
+  "중소기업대출 3조 확대, 무역금융 1.5조 확대, 주택담보대출 2조 축소, 기업대-일반 1.5조 축소 시 전행 RoRWA 및 BIS 영향을 분석해줘",
+  "2025년 DSR 3단계 시행에 따라 주택담보대출 성장을 제한하면서 중소기업·무역금융 중심으로 RoRWA를 개선하는 방안을 제시해줘",
+  "BIS 18.5% 이상 유지하면서 총여신 310조 달성을 위한 최적 포트폴리오 배분안을 도출해줘",
+];
+const NLP_RESPONSES = [
+  { intent:"중소기업·무역금융 확대 / 주택담보·기업대 축소를 통한 RoRWA 및 BIS 개선 분석", assets:[{name:"중소기업대출",change_100m:300},{name:"무역금융",change_100m:150},{name:"주택담보대출",change_100m:-200},{name:"기업대-일반",change_100m:-150}], constraints:["BIS 18.5% 이상 유지","총여신 증가 제한"], goal:"RoRWA 최대화 + BIS 안정" },
+  { intent:"DSR 3단계 규제 대응: 주택담보 성장 억제 + 중소기업/무역금융 중심 RoRWA 개선", assets:[{name:"주택담보대출",change_100m:-300},{name:"중소기업대출",change_100m:200},{name:"무역금융",change_100m:150}], constraints:["DSR 3단계 규제 준수","가계여신 비중 축소"], goal:"RoRWA 개선 + 규제 대응" },
+  { intent:"BIS 18.5% 이상 유지하며 총여신 310조 달성을 위한 포트폴리오 최적화", assets:[{name:"중소기업대출",change_100m:150},{name:"무역금융",change_100m:100},{name:"가계-신용/기타",change_100m:80}], constraints:["BIS 18.5% 이상","총여신 310조 목표"], goal:"성장 + 건전성 균형" },
+];
+
+// ────────── STEP / TAB LOGIC ──────────
+const STEPS = ['s1','s2','s3','s4','s5','s6'];
+let doneSteps = new Set();
+let currentStep = 's1';
+let currentMainTab = 'fwd';
+let currentMode = 'bp';
+let lockIds = [];
+let s4Confirmed = false;
+let connectedItems = new Set();
+
+function switchMain(tab, btn) {
+  currentMainTab = tab;
+  document.querySelectorAll('.tab-bar .tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('panel-fwd').classList.toggle('active', tab==='fwd');
+  document.getElementById('panel-inv').classList.toggle('active', tab==='inv');
+  document.getElementById('step-bar').style.display = tab==='fwd' ? 'flex' : 'none';
+}
+
+function switchStep(id) {
+  const idx = STEPS.indexOf(id);
+  const curIdx = STEPS.indexOf(currentStep);
+  if (id !== currentStep && !doneSteps.has(id) && idx > curIdx+1) return;
+  document.getElementById('sp-'+currentStep).classList.remove('active');
+  document.getElementById('stab-'+currentStep).classList.remove('active');
+  document.getElementById('sci-'+currentStep).className = 'step-circle ' + (doneSteps.has(currentStep)?'done':'inactive');
+  currentStep = id;
+  const el = document.getElementById('sp-'+id);
+  el.classList.add('active');
+  el.classList.remove('fade-in');
+  void el.offsetWidth;
+  el.classList.add('fade-in');
+  document.getElementById('stab-'+id).classList.add('active');
+  document.getElementById('sci-'+id).className = 'step-circle active';
+}
+
+function goStep(next) {
+  const cur = currentStep;
+  doneSteps.add(cur);
+  document.getElementById('sci-'+cur).className = 'step-circle done';
+  document.getElementById('sci-'+cur).textContent = '✓';
+  document.getElementById('stab-'+cur).classList.add('done');
+  switchStep(next);
+  updateDashRight();
+}
+
+function updateDashRight() {
+  if (doneSteps.has('s3')) {
+    document.getElementById('dash-right').innerHTML = `
+      <div style="font-size:11px;font-weight:700;color:var(--t2);margin-bottom:11px;">최적화 결과 요약</div>
+      <div style="padding:10px 12px;background:var(--greenL);border-radius:7px;border:1px solid #A7F3D0;margin-bottom:8px;">
+        <div style="font-size:10px;font-weight:700;color:var(--green);margin-bottom:3px;">📊 순방향 최적화 결과</div>
+        <div style="font-size:13px;font-weight:800;color:var(--t1);">RoRWA 1.82% → 1.98%</div>
+        <div style="font-size:11px;color:var(--t2);margin-top:2px;">개선폭 +0.16%p (+16bp)</div>
+      </div>
+      <div style="font-size:11px;color:var(--t2);">중소기업대출 3조↑ · 무역금융 1.5조↑<br>주택담보 2조↓ · 기업대-일반 1.5조↓</div>`;
+    document.getElementById('dash-rorwa').textContent = '1.98%';
+    document.getElementById('dash-rorwa-delta').style.display = 'block';
+    document.getElementById('dash-rorwa-delta').innerHTML = '<span style="color:var(--green);">▲ +16bp</span> <span style="color:var(--t3);">최적화 후</span>';
+  }
+}
+
+// ────────── INIT RoRWA BARS ──────────
+function initRorwaBars() {
+  const sorted = [...ASSETS].sort((a,b)=>b.rorwa-a.rorwa);
+  const maxV = sorted[0].rorwa;
+  const el = document.getElementById('rorwa-bars');
+  el.innerHTML = sorted.map((a,i) => `
+    <div class="mini-bar-row">
+      <div class="mini-bar-label">${a.name}</div>
+      <div class="mini-bar-track"><div class="mini-bar-fill" style="width:${(a.rorwa/maxV*100).toFixed(1)}%;background:${a.color};"></div></div>
+      <div class="mini-bar-val" style="color:${a.color};">${a.rorwa.toFixed(2)}%</div>
+    </div>`).join('');
+}
+
+// ────────── NLP ──────────
+function fillEx(i) { document.getElementById('nlp-input').value = EXAMPLES[i]; }
+let selectedNLP = 0;
+function runNLP() {
+  const txt = document.getElementById('nlp-input').value.trim();
+  if (!txt) return;
+  const btn = event.target;
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>분석 중...';
+  selectedNLP = EXAMPLES.findIndex(e => txt.includes(e.slice(0,15)));
+  if (selectedNLP < 0) selectedNLP = 0;
+  setTimeout(() => {
+    const r = NLP_RESPONSES[selectedNLP];
+    document.getElementById('nlp-intent').textContent = r.intent;
+    document.getElementById('nlp-assets').innerHTML = r.assets.map(a=>`
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;">
+        <span style="color:var(--t2);">${a.name}</span>
+        <span style="font-weight:700;color:${a.change_100m>0?'var(--green)':'var(--red)'};">${a.change_100m>0?'+':''}${a.change_100m}백억</span>
+      </div>`).join('');
+    document.getElementById('nlp-constraints').innerHTML =
+      r.constraints.map(c=>`<span class="chip" style="background:var(--amberL);color:var(--amber);margin-right:4px;margin-bottom:4px;">${c}</span>`).join('')
+      + `<div style="margin-top:6px;"><span class="chip" style="background:var(--greenL);color:var(--green);">${r.goal}</span></div>`;
+    const res = document.getElementById('nlp-result');
+    res.style.display = 'block';
+    res.classList.remove('fade-in'); void res.offsetWidth; res.classList.add('fade-in');
+    btn.disabled = false; btn.innerHTML = '🤖 의도 파악 실행';
+  }, 1200);
+}
+
+// ────────── DATA LOAD ──────────
+function startDataLoad() {
+  document.getElementById('s2-start-btn').style.display = 'none';
+  document.getElementById('s2-progress').style.display = 'block';
+  let p = 0;
+  const t = setInterval(() => {
+    p = Math.min(p + 4, 100);
+    document.getElementById('s2-bar').style.width = p + '%';
+    document.getElementById('s2-pct').textContent = p + '%';
+    if (p >= 33) connectSrc(0);
+    if (p >= 66) connectSrc(1);
+    if (p >= 90) connectSrc(2);
+    if (p >= 100) { clearInterval(t); showS2Result(); }
+  }, 60);
+}
+function connectSrc(i) {
+  const el = document.getElementById('src-'+i);
+  el.style.background = 'var(--greenL)';
+  el.style.borderColor = '#A7F3D0';
+  el.querySelectorAll('div')[1].style.color = 'var(--green)';
+  el.querySelectorAll('div')[2].textContent = '연결 완료';
+  el.querySelectorAll('div')[2].style.color = 'var(--green)';
+}
+function showS2Result() {
+  const sorted = [...ASSETS].sort((a,b)=>b.rorwa-a.rorwa);
+  document.getElementById('s2-table').innerHTML = sorted.map((a,i)=>`
+    <tr>
+      <td style="text-align:right;color:var(--t3);font-weight:700;">${i+1}</td>
+      <td style="text-align:left;color:var(--t1);font-weight:500;"><span class="dot" style="background:${a.color};"></span>${a.name}</td>
+      <td style="font-weight:800;color:${a.color};">${a.rorwa.toFixed(2)}%</td>
+      <td style="color:var(--t2);">${(a.rwa/10000).toFixed(1)}조</td>
+      <td style="color:var(--t2);">${a.interest.toLocaleString()}</td>
+      <td><span class="chip" style="background:${a.rw>=100?'var(--redL)':a.rw>=70?'var(--amberL)':'var(--greenL)'};color:${a.rw>=100?'var(--red)':a.rw>=70?'var(--amber)':'var(--green)'};">${a.rw}%</span></td>
+    </tr>`).join('');
+  const el = document.getElementById('s2-result');
+  el.style.display = 'block';
+  el.classList.remove('fade-in'); void el.offsetWidth; el.classList.add('fade-in');
+}
+
+// ────────── OPTIMIZE ──────────
+const S3_OPTS = [
+  {id:"sme",    chg:+30000},
+  {id:"corp_s", chg:0},
+  {id:"trade",  chg:+15000},
+  {id:"house",  chg:-20000},
+  {id:"corp_g", chg:-15000},
+  {id:"hh",     chg:+10000},
+];
+function runOptimize() {
+  const btn = document.getElementById('s3-run-btn');
+  btn.disabled = true;
+  document.getElementById('s3-progress').style.display = 'block';
+  let p = 0, iter = 0;
+  const t = setInterval(() => {
+    p = Math.min(p+2, 100); iter = Math.min(iter+8, 248);
+    document.getElementById('s3-bar').style.width = p + '%';
+    document.getElementById('s3-iter').textContent = iter + '회 반복';
+    if (p >= 100) { clearInterval(t); showS3Result(); btn.disabled=false; }
+  }, 44);
+}
+function showS3Result() {
+  const optMap = {};
+  S3_OPTS.forEach(o => optMap[o.id] = o.chg);
+  const newRorwaMap = {sme:2.26,corp_s:1.74,trade:3.23,house:1.41,corp_g:1.87,hh:3.96};
+  document.getElementById('s3-table').innerHTML = ASSETS.map(a => {
+    const chg = optMap[a.id]||0;
+    const nr = newRorwaMap[a.id];
+    return `<tr style="background:${chg!==0?a.color+'08':'transparent'};">
+      <td style="text-align:left;color:var(--t1);"><span class="dot" style="background:${a.color};"></span>${a.name}</td>
+      <td style="color:var(--t2);">${a.rorwa.toFixed(2)}%</td>
+      <td style="font-weight:700;color:${chg>0?'var(--green)':chg<0?'var(--red)':'var(--t3)'};">${chg!==0?(chg>0?'+':'')+(chg/10000).toFixed(1)+'조':'—'}</td>
+      <td style="font-weight:800;color:${a.color};">${nr.toFixed(2)}%</td>
+      <td><span class="chip" style="background:${nr>=2.5?'var(--greenL)':nr>=1.8?'var(--blueL)':'var(--amberL)'};color:${nr>=2.5?'var(--green)':nr>=1.8?'var(--blue)':'var(--amber)'};">${nr>=2.5?'확대':nr>=1.8?'유지':'축소검토'}</span></td>
+    </tr>`;
+  }).join('');
+  const el = document.getElementById('s3-result');
+  el.style.display = 'block';
+  el.classList.remove('fade-in'); void el.offsetWidth; el.classList.add('fade-in');
+  document.getElementById('s3-progress').style.display = 'none';
+}
+
+// ────────── RISK TAB ──────────
+function switchRisk(tab) {
+  document.getElementById('risk-ir').style.display = tab==='ir'?'block':'none';
+  document.getElementById('risk-liq').style.display = tab==='liq'?'block':'none';
+  document.getElementById('risk-tab-ir').classList.toggle('active', tab==='ir');
+  document.getElementById('risk-tab-liq').classList.toggle('active', tab==='liq');
+}
+function confirmRisk() {
+  s4Confirmed = true;
+  const btn = document.getElementById('s4-confirm-btn');
+  btn.textContent = '✓ 확인 완료';
+  btn.className = 'btn btn-success';
+  btn.onclick = () => goStep('s5');
+  btn.textContent = '다음 단계 진행 →';
+}
+
+// ────────── REPORT ──────────
+function genReport() {
+  const btn = document.getElementById('s5-report-btn');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>보고서 생성 중...';
+  setTimeout(() => {
+    btn.disabled = false; btn.innerHTML = '🤖 AI 자연어 보고서 생성';
+    const el = document.getElementById('s5-report');
+    el.style.display = 'block'; el.classList.remove('fade-in'); void el.offsetWidth; el.classList.add('fade-in');
+    document.getElementById('s5-next').style.display = 'block';
+  }, 1500);
+}
+
+// ────────── CONNECT ──────────
+const CONN_COLORS = { mgmt:'var(--blue)', lim:'var(--purple)', api:'var(--teal)', gov:'var(--green)' };
+function connectItem(id, btn, color) {
+  connectedItems.add(id);
+  const item = document.getElementById('ci-'+id);
+  const c = CONN_COLORS[id];
+  item.style.background = c.replace('var(--','').replace(')','') === 'blue' ? 'var(--blueL)' :
+    c.includes('purple') ? 'var(--purpleL)' : c.includes('teal') ? 'var(--tealL)' : 'var(--greenL)';
+  item.style.border = `1px solid ${c}44`;
+  item.querySelector('div div:first-child').style.color = c;
+  btn.textContent = '✓ 완료';
+  btn.disabled = true;
+  btn.style.background = c + '22';
+  btn.style.color = c;
+  btn.style.border = `1px solid ${c}44`;
+  if (connectedItems.size === 4) {
+    const el = document.getElementById('s6-done');
+    el.style.display = 'block'; el.classList.remove('fade-in'); void el.offsetWidth; el.classList.add('fade-in');
+  }
+}
+
+// ────────── MODE (bp/abs) ──────────
+function setMode(m) {
+  currentMode = m;
+  document.getElementById('mode-bp').className = 'btn ' + (m==='bp'?'':'btn-ghost');
+  document.getElementById('mode-bp').style.background = m==='bp'?'var(--blueL)':'#fff';
+  document.getElementById('mode-bp').style.color = m==='bp'?'var(--blue)':'var(--t2)';
+  document.getElementById('mode-bp').style.border = m==='bp'?'1px solid var(--blueM)':'1px solid var(--border2)';
+  document.getElementById('mode-abs').className = 'btn ' + (m==='abs'?'':'btn-ghost');
+  document.getElementById('mode-abs').style.background = m==='abs'?'var(--blueL)':'#fff';
+  document.getElementById('mode-abs').style.color = m==='abs'?'var(--blue)':'var(--t2)';
+  ['rorwa','bis','lcr'].forEach(k => {
+    document.getElementById(k+'-bp-area').style.display = m==='bp'?'block':'none';
+    document.getElementById(k+'-abs-area').style.display = m==='abs'?'block':'none';
+  });
+}
+function updateBpDisp(key) {
+  const bases = {rorwa:1.82, bis:18.64, lcr:117.3};
+  const colors = {rorwa:'var(--blue)', bis:'var(--purple)', lcr:'var(--teal)'};
+  const val = +document.getElementById('sl-'+key+'-bp').value;
+  const tgt = (bases[key] + val/100).toFixed(key==='lcr'?1:2);
+  document.getElementById(key+'-bp-disp').innerHTML = `+${val}bp → 목표 <strong>${tgt}%</strong>`;
+}
+function updateTargetUI() {
+  ['rorwa','bis','lcr'].forEach(key => {
+    const chk = document.getElementById('chk-'+key).checked;
+    const tb = document.getElementById('tb-'+key);
+    const sa = document.getElementById(key+'-slider-area');
+    const colors = {rorwa:{bg:'var(--blueL)',bd:'var(--blueM)',c:'var(--blue)'},bis:{bg:'var(--purpleL)',bd:'#DDD6FE',c:'var(--purple)'},lcr:{bg:'var(--tealL)',bd:'#99F6E4',c:'var(--teal)'}};
+    const cl = colors[key];
+    if (chk) {
+      tb.style.background = cl.bg; tb.style.border = `1px solid ${cl.bd}`;
+      tb.querySelector('.target-header span:nth-child(2)').style.color = cl.c;
+      sa.style.display = 'block';
+    } else {
+      tb.style.background = 'var(--sub)'; tb.style.border = '1px solid var(--border)';
+      tb.querySelector('.target-header span:nth-child(2)').style.color = 'var(--t2)';
+      sa.style.display = 'none';
+    }
+  });
+}
+
+// ────────── INVERSE OPTIMIZE ──────────
+function calcMetrics(assets) {
+  const totalInt = assets.reduce((s,a) => s + (a.balance + a.delta) * (a.interest / a.balance), 0);
+  const totalRwa = assets.reduce((s,a) => s + (a.balance + a.delta) * (a.rw / 100), 0);
+  const lcrD     = assets.reduce((s,a) => s + a.delta * a.lcrW, 0);
+  return {
+    rorwa: totalInt > 0 && totalRwa > 0 ? (totalInt / totalRwa) * 100 : 0,
+    bis:   totalRwa > 0 ? (BASE.equity / totalRwa) * 100 : 0,
+    lcr:   BASE.lcr + (lcrD / BASE.totalAsset) * 100,
+    totalRwa, totalInt,
+  };
+}
+function solveInverse(targetRorwa, targetBis, targetLcr, maxDelta) {
+  let assets = ASSETS.map(a => ({ ...a, delta:0 }));
+  if (!targetRorwa && !targetBis && !targetLcr) return { assets, ...calcMetrics(assets), totalDelta:0 };
+  const STEP = 5000, MAX_ITER = 300;
+  for (let it = 0; it < MAX_ITER; it++) {
+    const cur = calcMetrics(assets);
+    const used = assets.reduce((s,a) => s + Math.abs(a.delta), 0);
+    const needR = targetRorwa != null && cur.rorwa < targetRorwa;
+    const needB = targetBis   != null && cur.bis   < targetBis;
+    const needL = targetLcr   != null && cur.lcr   < targetLcr;
+    if (!needR && !needB && !needL) break;
+    let best = -Infinity, bi = -1, bs = 1;
+    assets.forEach((a, i) => {
+      if (lockIds.includes(a.id)) return;
+      [1,-1].forEach(sign => {
+        const nd = a.delta + sign * STEP;
+        if (Math.abs(nd) > maxDelta * 0.55 || used + STEP > maxDelta) return;
+        if (a.balance + nd < a.balance * 0.1) return;
+        const trial = assets.map((x,j) => j===i ? {...x,delta:nd} : x);
+        const m = calcMetrics(trial);
+        let sc = 0;
+        if (needR) sc += Math.max(0, m.rorwa - cur.rorwa) * 3;
+        if (needB) sc += Math.max(0, m.bis   - cur.bis)   * 2;
+        if (needL) sc += Math.max(0, m.lcr   - cur.lcr)   * 1;
+        if (!needR && targetRorwa && m.rorwa < cur.rorwa) sc -= 2;
+        if (!needB && targetBis   && m.bis   < cur.bis)   sc -= 2;
+        if (sc > best) { best = sc; bi = i; bs = sign; }
+      });
+    });
+    if (bi === -1 || best <= 0) break;
+    assets[bi] = { ...assets[bi], delta: assets[bi].delta + bs * STEP };
+  }
+  const f = calcMetrics(assets);
+  return { assets, resultRorwa:f.rorwa, resultBis:f.bis, resultLcr:f.lcr, totalRwa:f.totalRwa, totalDelta:assets.reduce((s,a)=>s+Math.abs(a.delta),0) };
+}
+
+function getTargets() {
+  const m = currentMode;
+  return {
+    rorwa: document.getElementById('chk-rorwa').checked ? (m==='bp' ? BASE.rorwa + (+document.getElementById('sl-rorwa-bp').value)/100 : (+document.getElementById('sl-rorwa-abs').value)/100) : null,
+    bis:   document.getElementById('chk-bis').checked   ? (m==='bp' ? BASE.bis   + (+document.getElementById('sl-bis-bp').value)/100   : (+document.getElementById('sl-bis-abs').value)/100)   : null,
+    lcr:   document.getElementById('chk-lcr').checked   ? (m==='bp' ? BASE.lcr   + (+document.getElementById('sl-lcr-bp').value)/100   : (+document.getElementById('sl-lcr-abs').value)/100)   : null,
+    maxDelta: +document.querySelector('#panel-inv input[type=range][oninput*="maxdelta"]')?.value || 300000,
+  };
+}
+
+function runInverse() {
+  const t = getTargets();
+  if (!t.rorwa && !t.bis && !t.lcr) return;
+  const btn = document.getElementById('inv-run-btn');
+  btn.disabled = true;
+  document.getElementById('inv-progress').style.display = 'block';
+  document.getElementById('inv-result').style.display = 'none';
+  let p = 0, iter = 0;
+  const interval = setInterval(() => {
+    p = Math.min(p+2, 100); iter = Math.min(iter+8, 248);
+    document.getElementById('inv-bar').style.width = p+'%';
+    document.getElementById('inv-iter').textContent = iter+'회 반복';
+    if (p >= 100) {
+      clearInterval(interval);
+      const res = solveInverse(t.rorwa, t.bis, t.lcr, t.maxDelta || 300000);
+      showInvResult(res, t);
+      btn.disabled = false;
+      document.getElementById('inv-progress').style.display = 'none';
+    }
+  }, 36);
+}
+
+function showInvResult(res, tgt) {
+  // 게이지
+  const gaugeData = [
+    {l:"RoRWA 결과", cur:res.resultRorwa, tgt:tgt.rorwa, base:BASE.rorwa, c:'var(--blue)', d:2},
+    {l:"BIS 결과",   cur:res.resultBis,   tgt:tgt.bis,   base:BASE.bis,   c:'var(--purple)', d:2},
+    {l:"LCR 결과",   cur:res.resultLcr,   tgt:tgt.lcr,   base:BASE.lcr,   c:'var(--teal)', d:1},
+  ];
+  document.getElementById('inv-gauges').innerHTML = gaugeData.map(g => {
+    const achieved = g.tgt ? g.cur >= g.tgt : true;
+    const pct = g.tgt ? Math.min((g.cur/g.tgt)*100, 100) : 100;
+    return `<div class="gauge-card">
+      <div style="font-size:11px;color:var(--t2);">${g.l}</div>
+      <div class="gauge-val" style="color:${g.c};">${g.cur.toFixed(g.d)}%</div>
+      ${g.tgt ? `<div style="font-size:10px;color:var(--t3);margin-top:2px;">목표 ${g.tgt.toFixed(g.d)}% · 기준 ${g.base}%</div>
+      <div class="gauge-track"><div class="gauge-fill" style="width:${pct.toFixed(1)}%;background:${achieved?'var(--green)':g.c};"></div></div>
+      <div class="gauge-result" style="color:${achieved?'var(--green)':'var(--amber)'};">
+        ${achieved ? `✓ 달성 (+${(g.cur-g.tgt).toFixed(g.d)}%p 초과)` : `미달 (${(g.cur-g.tgt).toFixed(g.d)}%p)`}
+      </div>` : ''}
+    </div>`;
+  }).join('');
+
+  // 조정안 테이블
+  const totBef = res.assets.reduce((s,a)=>s+a.balance,0);
+  const totAft = res.assets.reduce((s,a)=>s+a.balance+a.delta,0);
+  const totRwaBef = res.assets.reduce((s,a)=>s+a.rwa,0);
+  document.getElementById('inv-tbody').innerHTML = res.assets.map(a => {
+    const nb = a.balance + a.delta;
+    const wB = (a.balance/totBef*100).toFixed(1);
+    const wA = (nb/totAft*100).toFixed(1);
+    const dW = (nb/totAft - a.balance/totBef)*100;
+    const rwaA = nb*(a.rw/100);
+    const dR = rwaA - a.rwa;
+    const chg = a.delta !== 0;
+    return `<tr style="background:${chg?a.color+'08':'transparent'};opacity:${chg?1:0.55};">
+      <td style="text-align:left;font-weight:${chg?600:400};color:var(--t1);white-space:nowrap;">
+        <span class="dot" style="background:${a.color};"></span>${a.name}
+      </td>
+      <td><div style="font-size:12px;color:var(--t2);">${(a.balance/10000).toFixed(1)}조</div><div style="font-size:10px;color:var(--t3);">${wB}%</div></td>
+      <td><div style="font-size:12px;font-weight:${chg?700:400};color:${chg?'var(--t1)':'var(--t3)'};">${(nb/10000).toFixed(1)}조</div><div style="font-size:10px;color:${chg?a.color:'var(--t3)'};">${wA}%</div></td>
+      <td>${chg?`<span style="font-size:13px;font-weight:800;color:${a.delta>0?'var(--green)':'var(--red)'};">${a.delta>0?'+':''}${(a.delta/10000).toFixed(1)}조</span>`:'<span style="color:var(--t3);">—</span>'}</td>
+      <td>${chg?`<div style="font-size:12px;font-weight:700;color:${dW>0?'var(--green)':'var(--red)'};">${dW>=0?'+':''}${dW.toFixed(2)}%p</div>`:'<span style="color:var(--t3);">—</span>'}</td>
+      <td>${chg?`<div style="font-size:12px;font-weight:700;color:${dR>0?'var(--amber)':'var(--teal)'};">${dR>=0?'+':''}${(dR/10000).toFixed(1)}조</div>`:'<span style="color:var(--t3);">—</span>'}</td>
+      <td>${chg?`<span class="chip" style="background:${a.delta>0?'var(--greenL)':'var(--redL)'};color:${a.delta>0?'var(--green)':'var(--red)'};">${a.delta>0?'▲ 확대':'▼ 축소'}</span>`:'<span style="font-size:10px;color:var(--t3);">유지</span>'}</td>
+    </tr>`;
+  }).join('') + `<tr style="background:var(--sub);border-top:2px solid var(--border2);">
+    <td style="text-align:left;font-weight:700;color:var(--t1);">합 계</td>
+    <td><div style="font-size:12px;color:var(--t2);">${(totBef/10000).toFixed(1)}조</div><div style="font-size:10px;color:var(--t3);">100.0%</div></td>
+    <td><div style="font-size:12px;font-weight:700;color:var(--t1);">${(totAft/10000).toFixed(1)}조</div><div style="font-size:10px;color:var(--blue);">100.0%</div></td>
+    <td><span style="font-size:13px;font-weight:800;color:${(totAft-totBef)>=0?'var(--green)':'var(--red)'};">${(totAft-totBef)>=0?'+':''}${((totAft-totBef)/10000).toFixed(1)}조</span></td>
+    <td style="color:var(--t3);">—</td>
+    <td><span style="font-size:12px;font-weight:700;color:${(res.totalRwa-totRwaBef)>=0?'var(--amber)':'var(--teal)'};">${(res.totalRwa-totRwaBef)>=0?'+':''}${((res.totalRwa-totRwaBef)/10000).toFixed(1)}조</span><div style="font-size:10px;color:var(--t3);">${(totRwaBef/10000).toFixed(1)}조 → ${(res.totalRwa/10000).toFixed(1)}조</div></td>
+    <td></td>
+  </tr>`;
+
+  // 요약 KPI
+  document.getElementById('inv-kpis').innerHTML = [
+    {l:"총 자산 이동",    v:`${(res.totalDelta/10000).toFixed(1)}조`, c:'var(--amber)'},
+    {l:"조정 후 총 RWA", v:`${(res.totalRwa/10000).toFixed(1)}조`,   c:'var(--blue)'},
+    {l:"RoRWA 개선폭",   v:`+${((res.resultRorwa-BASE.rorwa)*100).toFixed(0)}bp`, c:'var(--green)'},
+    {l:"BIS 변동",       v:`${((res.resultBis-BASE.bis)*100)>=0?'+':''}${((res.resultBis-BASE.bis)*100).toFixed(0)}bp`, c:'var(--purple)'},
+  ].map(k=>`<div style="text-align:center;padding:10px 12px;background:var(--sub);border-radius:7px;border:1px solid var(--border);">
+    <div style="font-size:10px;color:var(--t3);margin-bottom:3px;">${k.l}</div>
+    <div style="font-size:16px;font-weight:800;color:${k.c};">${k.v}</div>
+  </div>`).join('');
+
+  const el = document.getElementById('inv-result');
+  el.style.display = 'block'; el.classList.remove('fade-in'); void el.offsetWidth; el.classList.add('fade-in');
+  document.getElementById('inv-comment').style.display = 'none';
+}
+
+function genInvComment() {
+  const btn = document.getElementById('inv-comment-btn');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>분석 중...';
+  setTimeout(() => {
+    btn.disabled = false; btn.innerHTML = '🤖 AI 경영진 코멘트 생성';
+    const el = document.getElementById('inv-comment');
+    const t = getTargets();
+    const tRorwa = t.rorwa ? t.rorwa.toFixed(2)+'%' : '미설정';
+    const tBis   = t.bis   ? t.bis.toFixed(2)+'%'   : '미설정';
+    const tLcr   = t.lcr   ? t.lcr.toFixed(1)+'%'   : '미설정';
+    document.getElementById('inv-comment-text').innerHTML =
+      `<p>역산 최적화 결과, 목표 지표(RoRWA ${tRorwa} / BIS ${tBis} / LCR ${tLcr}) 달성을 위한 최적 포트폴리오 배분안이 도출되었습니다.</p>
+       <p style="margin-top:8px;">무역금융 및 가계-신용 자산군의 RoRWA 기여도가 높아 해당 자산군 확대가 효과적이며, 주택담보대출은 낮은 RW(35%)로 BIS 개선에 유리하나 RoRWA를 저하시키는 트레이드오프가 존재합니다.</p>
+       <p style="margin-top:8px;">2024년말 NIM 1.78% 및 BIS 18.64% 기준, 목표 달성 시 자본효율성과 수익성을 동시에 개선할 수 있을 것으로 판단되며, DSR 3단계 규제 및 금리 하락 추세를 감안한 지속적인 포트폴리오 모니터링을 권고합니다.</p>`;
+    el.style.display = 'block'; el.classList.remove('fade-in'); void el.offsetWidth; el.classList.add('fade-in');
+  }, 1500);
+}
+
+// ────────── LOCK BUTTONS ──────────
+function initLockBtns() {
+  document.getElementById('lock-btns').innerHTML = ASSETS.map(a =>
+    `<button id="lbtn-${a.id}" onclick="toggleLock('${a.id}',this,'${a.color}')" style="font-size:10px;padding:3px 8px;border-radius:4px;cursor:pointer;border:1px solid var(--border);background:#fff;color:var(--t2);">${a.name.slice(0,5)}</button>`
+  ).join('');
+}
+function toggleLock(id, btn, color) {
+  if (lockIds.includes(id)) {
+    lockIds = lockIds.filter(x=>x!==id);
+    btn.style.border = '1px solid var(--border)';
+    btn.style.background = '#fff';
+    btn.style.color = 'var(--t2)';
+    btn.style.fontWeight = '400';
+    btn.textContent = ASSETS.find(a=>a.id===id).name.slice(0,5);
+  } else {
+    lockIds.push(id);
+    btn.style.border = `1px solid ${color}`;
+    btn.style.background = color+'18';
+    btn.style.color = color;
+    btn.style.fontWeight = '700';
+    btn.textContent = '🔒 ' + ASSETS.find(a=>a.id===id).name.slice(0,5);
+  }
+}
+
+// ────────── INIT ──────────
+window.addEventListener('DOMContentLoaded', () => {
+  initRorwaBars();
+  initLockBtns();
+  // maxdelta input 수정 (inline oninput 연동)
+  document.querySelector('#panel-inv .slider-row input[type=range][step="50000"]') &&
+    (document.querySelector('#panel-inv .slider-row input[type=range][step="50000"]').oninput =
+      function() { document.getElementById('sv-maxdelta').textContent = (this.value/10000).toFixed(0)+'조'; });
+});
+</script>
+</body>
+</html>
